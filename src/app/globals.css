@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'GlacialIndifference';
+  src: url('../public/font/GlacialIndifference-Regular.otf') format('opentype'),
+       url('../public/font/GlacialIndifference-Bold.otf') format('opentype'),
+       url('../public/font/GlacialIndifference-Italic.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Safira';
+  src: url('../public/font/Safira March.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  .vi {
+    --background: 30 50% 95%; /* #F5EDE5 */
+    --foreground: 30 50% 30%; /* Escolhido um tom escuro da mesma família para o texto */
+
+    --card: 30 40% 85%; /* Tom mais escuro do que o background para contraste */
+    --card-foreground: 30 50% 30%; /* Mesmo tom do foreground */
+
+    --popover: 30 40% 85%; /* Igual ao card */
+    --popover-foreground: 30 50% 30%; /* Igual ao foreground */
+
+    --primary: 33 60% 60%; /* #D2965D */
+    --primary-foreground: 30 50% 95%; /* Mesmo que o background */
+
+    --secondary: 33 50% 50%; /* Tom mais escuro para contraste */
+    --secondary-foreground: 30 50% 95%; /* Igual ao background */
+
+    --muted: 33 50% 50%; /* Igual ao secondary */
+    --muted-foreground: 30 50% 70%; /* Tom mais claro para contraste */
+
+    --accent: 33 50% 50%; /* Igual ao secondary */
+    --accent-foreground: 30 50% 95%; /* Igual ao background */
+
+    --destructive: 7 60% 60%; /* Um tom vermelho próximo para contraste */
+    --destructive-foreground: 30 50% 95%; /* Igual ao background */
+
+    --border: 33 50% 50%; /* Igual ao secondary */
+    --input: 33 50% 50%; /* Igual ao secondary */
+    --ring: 33 60% 70%; /* Um tom mais claro do primary */
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased h-screen flex flex-col;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));  /* Cor do track da scrollbar */
+  border-radius: var(--radius);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--primary));  /* Cor do thumb da scrollbar */
+  border-radius: var(--radius);
+  border: 2px solid hsl(var(--background));  /* Cor da borda do thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--primary) / 0.8);  /* Cor do thumb da scrollbar ao passar o mouse */
+}

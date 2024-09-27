@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(uuid())
+  name              String?
+  email             String?   @unique
+  emailVerified     DateTime? @map("email_verified")
+  telephone         String?
+  date_brith        DateTime?
+  image             String?
+  marital_status    String?
+  cpf               String?   @unique
+  work              String?
+  emergency_contact String?
+  address           String?
+  createdAt         DateTime? @db.Date
+  updatedAt         DateTime? @db.Date
+
+  // Campos adicionais
+  is_pregnant           Boolean?
+  has_children          String?    // Pode ser enum: "Sim, 1-2 filhos", "Sim, 3 ou mais filhos", "Não, nenhum"
+  long_sitting          Boolean?
+  surgical_history      String?    // Tipo de cirurgia anterior
+  previous_cosmetic     Boolean?
+  allergic_history      String?    // Descrição das alergias
+  regular_bowel_function Boolean?
+  exercise_duration     String?    // Tempo praticando atividade física
+  is_smoker             Boolean?
+  alcohol_consumption   Boolean?
+  balanced_diet         Boolean?
+  water_consumption     Boolean?
+  orthopedic_issues     String?    // Problemas ortopédicos
+  medical_treatment     String?    // Tratamento médico atual
+  skin_acids_usage      String?    // Uso de ácidos na pele
+  pacemaker_present     Boolean?
+  metal_presence        String?    // Onde há presença de metais
+  oncologic_history     String?    // Tipo de antecedentes oncológicos
+  menstrual_cycle       String?    // Descrição do ciclo menstrual
+  contraceptive_method  String?    // Método anticonceptivo utilizado
+  varicose_veins        Boolean?
+  lesions_present       Boolean?
+  hypertension          Boolean?
+  hypotension           Boolean?
+  diabetes_type         String?    // Tipo de diabetes, se houver
+  epilepsy              Boolean?
+
+  booking  Booking[]
+  accounts Account[]
+  sessions Session[]
+}
+
+model Service {
+  id           String  @id @default(uuid())
+  name         String
+  imageUrl     String
+  type         String
+  description  String
+  price        Decimal @db.Decimal(10, 2)
+  time_service String
+
+  booking Booking[]
+}
+
+model Booking {
+  id        String    @id @default(uuid())
+  userId    String
+  serviceId String
+  date      DateTime
+  createdAt DateTime? @db.Date
+
+  user    User    @relation(fields: [userId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
