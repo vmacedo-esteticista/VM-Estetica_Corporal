@@ -239,7 +239,7 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
                         <div className="flex justify-between">
                           <h2 className="font-bold">Tempo de Serviço</h2>
                           <h3 className="font-bold">
-                            {service.time_service}
+                            {service.time_service || ''}
                           </h3>
                         </div>
 

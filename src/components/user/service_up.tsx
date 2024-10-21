@@ -82,7 +82,7 @@ const ServiceUpload = ({ service }: ServiceProps) => {
       setValue("name", selectedService.name);
       setValue("type", selectedService.type);
       setValue("price", Number(selectedService.price.toString()));
-      setValue("time_service", selectedService.time_service);
+      setValue("time_service", selectedService.time_service || '');
       try {
         const parsedDescription = selectedService.description
           ? JSON.parse(selectedService.description)

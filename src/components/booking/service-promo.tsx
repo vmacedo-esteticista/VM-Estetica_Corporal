@@ -317,7 +317,7 @@ const ServicePromo = ({ service, user }: ServicePromoProps) => {
 
                         <div className="flex justify-between">
                           <h2 className="font-bold">Tempo de Serviço</h2>
-                          <h3 className="font-bold">{service.time_service}</h3>
+                          <h3 className="font-bold">{service.time_service || ''}</h3>
                         </div>
 
                         {selections.length > 0 && (
