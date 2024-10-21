@@ -18,7 +18,7 @@ const CardCell = () => {
       <Card className="bg-[#F6EEE6] border-none shadow-none md:flex md:gap-x-[2rem] lg:gap-x-[5rem] xl:gap-x-[10rem] 2xl:gap-x-[15rem] flex-row gap-x-0 mx-auto">
         <CardHeader className="p-0">
           <Image
-            src="https://utfs.io/f/e769ac6e-86c8-4e5a-a913-ddb82fd2cfb5-1toc.png"
+            src="https://utfs.io/f/mUywBsJr5TYLnte7xqwYQNhKUvubjokg9MC7w62z0cRAJypB"
             width={440}
             height={200}
             alt="logo"
@@ -50,7 +50,7 @@ const CardCell = () => {
         </CardContent>
         <CardFooter className="md:hidden flex-col items-center p-0 relative">
         <Image
-            src="https://utfs.io/f/83c7c1ab-5e79-416c-9481-5a9f423062da-1zbfv.png"
+            src="https://utfs.io/f/mUywBsJr5TYLZdahQ3LjD4SzIUFKot062CavGcNhMbJfQPVX"
             width={150}
             height={100}
             alt="logo"

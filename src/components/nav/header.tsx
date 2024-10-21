@@ -18,7 +18,7 @@ const Header = () => {
     <Card className="border-none">
       <CardContent className="p-5 justify-between items-center flex flex-row">
         <Image
-          src="https://utfs.io/f/fd41f0e6-9e0f-4cb4-9133-619b327a5bc9-7xf86y.43.09_023f79e6.jpg"
+          src="https://utfs.io/f/mUywBsJr5TYLZdahQ3LjD4SzIUFKot062CavGcNhMbJfQPVX"
           width={95}
           height={22}
           alt="VM - Estética Corporal"

@@ -30,7 +30,6 @@ export function generateDayTimeListI(date: Date, serviceTime: number): string[] 
 export function generateDayTimeListII(date: Date, serviceTime: number): string[] {
   const startTime = setMinutes(setHours(date, 8), 0); // Set start time to 09:00
   const endTime = setMinutes(setHours(date, 12), 0); // Set end time to 11:00
-  console.log(serviceTime)
   const interval = serviceTime + 90; // Interval in minutes 1:30min
   
   const timeList: string[] = [];

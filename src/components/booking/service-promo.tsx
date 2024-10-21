@@ -5,7 +5,6 @@ import { Booking, Service, User } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-
 import { getDayBookings } from "./actions/get-day-bookings";
 import { Button } from "@/src/components/ui/button";
 import { Calendar } from "@/src/components/ui/calendar";
@@ -20,38 +19,86 @@ import {
 } from "@/src/components/ui/sheet";
 import { saveBooking } from "@/src/components/booking/actions/save-booking";
 import { generateDayTimeListI, generateDayTimeListII } from "@/src/utils/hours";
-
-import { differenceInMinutes, format, getDay, parse, setHours, setMinutes } from "date-fns";
+import {
+  differenceInMinutes,
+  format,
+  getDay,
+  parse,
+  setHours,
+  setMinutes,
+} from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import {
   CalendarSearch,
+  CirclePlus,
   Loader,
   LogInIcon,
   UserCircle2,
   UserCog2Icon,
 } from "lucide-react";
 import { toast } from "sonner";
+import { string } from "yup";
 
-interface ServiceItemProps {
+interface ServicePromoProps {
   service: Service;
   user: User | null;
 }
-const ServiceItem = ({ service, user }: ServiceItemProps) => {
+const ServicePromo = ({ service, user }: ServicePromoProps) => {
   const router = useRouter();
   const { data } = useSession();
+  const [serviceid, setServiceId] = useState<string | undefined>(undefined);
   const [date, setDate] = useState<Date | undefined>();
-  const [hour, setHour] = useState<String | undefined>();
+  const [hour, setHour] = useState<string | undefined>();
+  const [selections, setSelections] = useState<{ date: Date; hour: string }[]>([]);
+  const [overallMaxSessions, setOverallMaxSessions] = useState<number>(0);
   const [subumitIsLoading, setIsLoading] = useState(false);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [dayBookings, setDayBookings] = useState<Booking[]>([]);
-  const descriptions = JSON.parse(service.description);
-  const handleLoginClick = () => signIn("google");
-  
+  const desc = JSON.parse(service.description);
+
+  let descriptions: string[] = [];
+  try {
+    descriptions = Array.isArray(JSON.parse(service.description))
+      ? JSON.parse(service.description)
+      : [service.description];
+  } catch (error) {
+    console.error("Erro ao analisar a descrição do serviço:", error);
+  }
+
   useEffect(() => {
-    if(!user){
+    if (service.id === serviceid) {
+      const newMaxSessions: { [key: string]: number } = {};
+      for (const description of descriptions) {
+        const regex = /(\d+)\s+sessões?\s+de\s+([A-Za-z\s]+)/g;
+        let match;
+        while ((match = regex.exec(description))) {
+          const sessions = parseInt(match[1], 10);
+          const serviceType = match[2].trim();
+          if (newMaxSessions[serviceType]) {
+            newMaxSessions[serviceType] = Math.max(newMaxSessions[serviceType], sessions);
+          } else {
+            newMaxSessions[serviceType] = sessions;
+          }
+        }
+      }
+      const maxSessionsValue = Math.max(...Object.values(newMaxSessions));
+      setOverallMaxSessions(maxSessionsValue);
+    }
+  }, [descriptions, serviceid, service]);
+
+  const handleLoginClick = () => signIn("google");
+
+  useEffect(() => {
+    if (!user) {
       return;
     }
-    if (!user.work || !user.cpf || !user.address || !user.emergency_contact || !user.telephone) {
+    if (
+      !user.work ||
+      !user.cpf ||
+      !user.address ||
+      !user.emergency_contact ||
+      !user.telephone
+    ) {
       router.push(`/user/${user?.id}`);
     }
   }, [user, router]);
@@ -68,7 +115,7 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
     refreshAvailableHours();
   }, [date]);
 
-  const handleDateClick = (date: Date | undefined) => {
+  const handleDateClick = (date: Date) => {
     setDate(date);
     setHour(undefined);
   };
@@ -77,16 +124,43 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
     setHour(time);
   };
 
+  const handleAddSelection = () => {
+    if (date && hour) {
+      const exists = selections.some(
+        (selection) => selection.date.toISOString() === date.toISOString()
+      );
+      
+      if (!exists) {
+        setSelections((prevSelections) => [
+          ...prevSelections,
+          { date, hour }
+        ]);
+      } else {
+        toast.error("Esta data já foi selecionada!");
+      }
+      setDate(undefined);
+      setHour(undefined);
+    }
+  };
+
   const timeList = useMemo(() => {
-    const parsedTime = parse(service.time_service ?? '01:00', 'HH:mm', new Date());
-    const serviceTime = differenceInMinutes(parsedTime, setHours(setMinutes(new Date(), 0), 0));
+    const parsedTime = parse(
+      service.time_service ?? "01:00",
+      "HH:mm",
+      new Date()
+    );
+    const serviceTime = differenceInMinutes(
+      parsedTime,
+      setHours(setMinutes(new Date(), 0), 0)
+    );
     if (!date) {
       return [];
     }
     const dayOfWeek = getDay(date);
-    const generateDayTimeList = (dayOfWeek === 6)
-     ? (date: Date) => generateDayTimeListI(date, serviceTime) 
-     : (date: Date) => generateDayTimeListII(date, serviceTime);
+    const generateDayTimeList =
+      dayOfWeek === 6
+        ? (date: Date) => generateDayTimeListI(date, serviceTime)
+        : (date: Date) => generateDayTimeListII(date, serviceTime);
 
     return generateDayTimeList(date).filter((time) => {
       const timeHour = Number(time.split(":")[0]);
@@ -106,37 +180,44 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
 
   const handleBookingSubmit = async () => {
     setIsLoading(true);
+  
     try {
-      if (!hour || !date || !data?.user) {
+      if (!selections.length || selections.length < overallMaxSessions || !data?.user) {
         return;
       }
-      const dateHour = Number(hour.split(":")[0]);
-      const dateMinutes = Number(hour.split(":")[1]);
-      const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
-
-      await saveBooking({
-        serviceId: service.id,
-        date: newDate,
-        userId: (data?.user as any).id,
-      });
-
+  
+      for (const selection of selections) {
+        const dateHour = Number(selection.hour.split(":")[0]);
+        const dateMinutes = Number(selection.hour.split(":")[1]);
+        const newDate = setMinutes(setHours(selection.date, dateHour), dateMinutes);
+  
+        await saveBooking({
+          serviceId: service.id,
+          date: newDate,
+          userId: (data?.user as any).id,
+        });
+  
+        toast("Reserva realizada com Sucesso!", {
+          description: format(newDate, "'Para' dd 'de' MMMM 'às' HH':'mm'.'", {
+            locale: ptBR,
+          }),
+          action: {
+            label: "Visualizar",
+            onClick: () => router.push("/bookings"),
+          },
+        });
+      }
+  
       setSheetIsOpen(false);
       setHour(undefined);
       setDate(undefined);
-      toast("Reserva realizada com Sucesso!", {
-        description: format(newDate, "'Para' dd 'de' MMMM 'às' HH':'mm'.'", {
-          locale: ptBR,
-        }),
-        action: {
-          label: "Visualizar",
-          onClick: () => router.push("/bookings"),
-        },
-      });
+      setSelections([]);
     } catch (error) {
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const missingData = [];
   if (!user?.telephone) missingData.push("Telefone");
@@ -160,9 +241,9 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
         <div className="flex flex-col justify-between px-3">
           <h2 className="font-bold mt-3">{service.name}</h2>
           <div className="flex-1 text-sm mb-16">
-            {Object.keys(descriptions).map((key: string) => (
+            {Object.keys(desc).map((key: string) => (
               <p className="text-[#804c2f]" key={key}>
-                <span className="bullet">&bull;</span> {descriptions[key]}
+                <span className="bullet">&bull;</span> {desc[key]}
               </p>
             ))}
           </div>
@@ -170,12 +251,11 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
         <div className="absolute bottom-0 w-full px-2 py-3">
           <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen} modal>
             <SheetTrigger asChild>
-              <Button variant={"secondary"} size={"icon"} className="w-full">
+              <Button variant={"secondary"} size={"icon"} className="w-full" onClick={() => setServiceId(service.id)}>
                 <CalendarSearch className="mr-3" />
-                Reservar
+                Reservar Promoção
               </Button>
             </SheetTrigger>
-
             {data?.user ? (
               missingData.length === 0 ? (
                 <SheetContent
@@ -187,12 +267,11 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
                   </SheetHeader>
 
                   <Calendar
-                    mode="single"
                     selected={date}
-                    onSelect={handleDateClick}
+                    onDayClick={handleDateClick}
                     locale={ptBR}
                     fromDate={new Date()}
-                    disabled={{dayOfWeek: [2, 4]}}
+                    disabled={{ dayOfWeek: [2, 4] }}
                     styles={{
                       months: {
                         display: "flex",
@@ -238,33 +317,36 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
 
                         <div className="flex justify-between">
                           <h2 className="font-bold">Tempo de Serviço</h2>
-                          <h3 className="font-bold">
-                            {service.time_service}
-                          </h3>
+                          <h3 className="font-bold">{service.time_service}</h3>
                         </div>
 
-                        {date && (
-                          <div className="flex justify-between">
-                            <h3 className="text-sm">Data</h3>
-                            <h4 className="text-sm">
-                              {format(date, "dd 'de' MMMM", {
-                                locale: ptBR,
-                              })}
-                            </h4>
-                          </div>
+                        {selections.length > 0 && (
+                          <>
+                            {selections.map((selection, index) => (
+                              <div key={index}>
+                                <div className="flex justify-between">
+                                  <h3 className="text-sm">Data</h3>
+                                  <h4 className="text-sm">
+                                    {format(selection.date, "dd 'de' MMMM", {
+                                      locale: ptBR,
+                                    })}
+                                  </h4>
+                                </div>
+                                <div className="flex justify-between">
+                                  <h3 className="text-sm">Horário</h3>
+                                  <h4 className="text-sm">{selection.hour}</h4>
+                                </div>
+                              </div>
+                            ))}
+                          </>
                         )}
 
-                        {hour && (
-                          <div className="flex justify-between">
-                            <h3 className="text-sm">Horário</h3>
-                            <h4 className="text-sm">{hour}</h4>
-                          </div>
-                        )}
-
-                        {/* <div className="flex justify-between">
-                        <h3 className="text-sm">Endereço</h3>
-                       <h3>{user?.addresses}</h3> 
-                      </div>*/}
+                        <Button
+                          onClick={handleAddSelection}
+                          disabled={!date || !hour || selections.length >= overallMaxSessions}
+                        >
+                          Adicionar Data e Hora <CirclePlus />
+                        </Button>
                       </CardContent>
                     </Card>
                   </div>
@@ -272,7 +354,7 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
                   <SheetFooter className="flex justify-center px-5 sm:justify-center">
                     <Button
                       onClick={handleBookingSubmit}
-                      disabled={!hour || !date || subumitIsLoading}
+                      disabled={selections.length < overallMaxSessions}
                     >
                       {subumitIsLoading && (
                         <Loader className="mr-2 h-4 w-4 animate-spin" />
@@ -341,4 +423,4 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
   );
 };
 
-export default ServiceItem;
+export default ServicePromo;

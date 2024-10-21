@@ -6,28 +6,42 @@ CREATE TABLE "User" (
     "email_verified" TIMESTAMP(3),
     "telephone" TEXT,
     "date_brith" TIMESTAMP(3),
-    "image" TEXT NOT NULL,
-    "cpf" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "image" TEXT,
+    "marital_status" TEXT,
+    "cpf" TEXT,
+    "work" TEXT,
+    "emergency_contact" TEXT,
+    "address" TEXT,
     "createdAt" DATE,
     "updatedAt" DATE,
+    "is_pregnant" BOOLEAN,
+    "has_children" TEXT,
+    "long_sitting" BOOLEAN,
+    "surgical_history" TEXT,
+    "previous_cosmetic" BOOLEAN,
+    "allergic_history" TEXT,
+    "regular_bowel_function" BOOLEAN,
+    "exercise_duration" TEXT,
+    "is_smoker" BOOLEAN,
+    "alcohol_consumption" BOOLEAN,
+    "balanced_diet" BOOLEAN,
+    "water_consumption" BOOLEAN,
+    "orthopedic_issues" TEXT,
+    "medical_treatment" TEXT,
+    "skin_acids_usage" TEXT,
+    "pacemaker_present" BOOLEAN,
+    "metal_presence" TEXT,
+    "oncologic_history" TEXT,
+    "menstrual_cycle" TEXT,
+    "contraceptive_method" TEXT,
+    "varicose_veins" BOOLEAN,
+    "lesions_present" BOOLEAN,
+    "hypertension" BOOLEAN,
+    "hypotension" BOOLEAN,
+    "diabetes_type" TEXT,
+    "epilepsy" BOOLEAN,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Address" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "street" TEXT NOT NULL,
-    "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
-    "country" TEXT NOT NULL,
-    "cep" TEXT NOT NULL,
-    "createdAt" DATE,
-    "updatedAt" DATE,
-
-    CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -48,7 +62,6 @@ CREATE TABLE "Booking" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "serviceId" TEXT NOT NULL,
-    "addressId" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "createdAt" DATE,
 
@@ -106,16 +119,10 @@ CREATE UNIQUE INDEX "Session_session_token_key" ON "Session"("session_token");
 CREATE UNIQUE INDEX "VerificationToken_identifier_token_key" ON "VerificationToken"("identifier", "token");
 
 -- AddForeignKey
-ALTER TABLE "Address" ADD CONSTRAINT "Address_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Booking" ADD CONSTRAINT "Booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Booking" ADD CONSTRAINT "Booking_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Booking" ADD CONSTRAINT "Booking_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -77,7 +77,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
               <h2 className="font-bold mx-1">{service.name}</h2>
               <div className="flex items-center gap-2 my-2">
                 <Image
-                  src={service.imageUrl}
+                  src={service.imageUrl ?? ''}
                   width={95}
                   height={22}
                   alt="VM - Estética Corporal"
