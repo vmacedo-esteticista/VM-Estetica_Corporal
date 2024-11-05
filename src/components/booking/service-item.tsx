@@ -78,15 +78,16 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
   };
 
   const timeList = useMemo(() => {
-    const parsedTime = parse(service.time_service ?? '01:00', 'HH:mm', new Date());
-    const serviceTime = differenceInMinutes(parsedTime, setHours(setMinutes(new Date(), 0), 0));
-    if (!date) {
+    const timeService = service.time_service ?? '01:00'
+    const timeServiceInMinutes = parseInt(timeService, 10);
+
+   if (!date) {
       return [];
     }
     const dayOfWeek = getDay(date);
     const generateDayTimeList = (dayOfWeek === 6)
-     ? (date: Date) => generateDayTimeListI(date, serviceTime) 
-     : (date: Date) => generateDayTimeListII(date, serviceTime);
+     ? (date: Date) => generateDayTimeListI(date, timeServiceInMinutes) 
+     : (date: Date) => generateDayTimeListII(date, timeServiceInMinutes);
 
     return generateDayTimeList(date).filter((time) => {
       const timeHour = Number(time.split(":")[0]);
@@ -192,7 +193,7 @@ const ServiceItem = ({ service, user }: ServiceItemProps) => {
                     onSelect={handleDateClick}
                     locale={ptBR}
                     fromDate={new Date()}
-                    disabled={{dayOfWeek: [2, 4]}}
+                    disabled={{dayOfWeek: [3, 4, 0]}}
                     styles={{
                       months: {
                         display: "flex",
