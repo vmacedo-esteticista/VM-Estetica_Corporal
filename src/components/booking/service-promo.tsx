@@ -145,16 +145,16 @@ const ServicePromo = ({ service, user }: ServicePromoProps) => {
 
   const timeList = useMemo(() => {
     const timeService = service.time_service ?? '01:00'
-    const timeServiceInMinutes = parseInt(timeService, 10);
-
+    const [hours, minutes] = timeService.split(':').map((num: string) => parseInt(num, 10));
+    const totalMinutes = (hours * 60) + minutes;
     if (!date) {
       return [];
     }
     const dayOfWeek = getDay(date);
     const generateDayTimeList =
       dayOfWeek === 6
-        ? (date: Date) => generateDayTimeListI(date, timeServiceInMinutes)
-        : (date: Date) => generateDayTimeListII(date, timeServiceInMinutes);
+        ? (date: Date) => generateDayTimeListI(date, totalMinutes)
+        : (date: Date) => generateDayTimeListII(date, totalMinutes);
 
     return generateDayTimeList(date).filter((time) => {
       const timeHour = Number(time.split(":")[0]);
