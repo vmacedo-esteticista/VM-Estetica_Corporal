@@ -201,8 +201,8 @@ export function GridAtendimento({ bookings }: GridAtendimentoProps) {
                 </div>
                 <h1>
                   Data de Nascimento:{" "}
-                  {format(new Date(selectedBooking.date_brith ?? ''), "dd/MM/yyyy")}{" "}
-                  Idade: {calculateAge(new Date(selectedBooking.date_brith ?? ''))}
+                  {format(new Date(selectedBooking.date_birth ?? ''), "dd/MM/yyyy")}{" "}
+                  Idade: {calculateAge(new Date(selectedBooking.date_birth ?? ''))}
                 </h1>
                 <Link className="text-blue-700" href={`https://vm-estetica-corporal.vercel.app/user/${selectedBooking.id}`}> Acesse a conta de {selectedBooking.name}</Link>
                 <h1>CPF: {selectedBooking.cpf}</h1>

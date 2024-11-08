@@ -26,7 +26,7 @@ const FormSchema = yup.object({
   name: yup.string().required("Nome é obrigatório"),
   email: yup.string().required().email("E-mail inválido"),
   telephone: yup.string().required("Telefone é obrigatório"),
-  date_brith: yup.date().required("Data de Nascimento é obrigatório"),
+  date_birth: yup.date().required("Data de Nascimento é obrigatório"),
   marital_status: yup.string().required("Estado civil é obrigatório"),
   cpf: yup.string().test("isValidCPF", "CPF inválido", function (value) {
     return isValidCPF(value);
@@ -70,7 +70,7 @@ interface FormValues {
   name: string;
   email: string;
   telephone: string;
-  date_brith: Date;
+  date_birth: Date;
   marital_status: string;
   cpf: string;
   address: string;
@@ -119,7 +119,7 @@ const Users = ({ user }: Props) => {
       telephone: user.telephone || "",
       email: user.email || "",
       address: user.address ? user.address.split(", lat=")[0] : "",
-      date_brith: user.date_brith ? new Date(user.date_brith) : undefined,
+      date_birth: user.date_birth ? new Date(user.date_birth) : undefined,
       marital_status: user.marital_status || "",
       work: user.work || "",
       cpf: user.cpf || "",
@@ -182,17 +182,17 @@ const Users = ({ user }: Props) => {
         <div className="my-4">
           <h1 className="block font-bold mb-2">Data de Nascimento</h1>
           <Input
-            id="date_brith"
+            id="date_birth"
             type="date"
             placeholder=""
-            {...register("date_brith")}
+            {...register("date_birth")}
             value={
-              watch("date_brith")
-                ? format(new Date(watch("date_brith")), "yyyy-MM-dd")
+              watch("date_birth")
+                ? format(new Date(watch("date_birth")), "yyyy-MM-dd")
                 : ""
             }
           />
-          {errors.date_brith && <span>Este campo é obrigatório.</span>}
+          {errors.date_birth && <span>Este campo é obrigatório.</span>}
         </div>
         <div className="my-4">
           <h1 className="block font-bold mb-2">CPF</h1>

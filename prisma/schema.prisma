@@ -13,15 +13,15 @@ model User {
   email             String   @unique
   emailVerified     DateTime? @map("email_verified")
   telephone         String?
-  date_brith        DateTime
-  image             String
-  marital_status    String
-  cpf               String   @unique
-  work              String
-  emergency_contact String
-  address           String
+  date_birth        DateTime?
+  image             String?
+  marital_status    String?
+  cpf               String?   @unique
+  work              String?
+  emergency_contact String?
+  address           String?
   createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  updatedAt         DateTime? @updatedAt
 
   // Campos adicionais
   is_pregnant           Boolean?

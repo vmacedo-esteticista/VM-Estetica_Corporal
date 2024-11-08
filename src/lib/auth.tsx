@@ -10,18 +10,23 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      authorization: {
+        params: {
+          scope: "openid profile email",
+        },
+      },
     }),
   ],
   callbacks: {
     async session({ session, user }) {
-      session.user = { ...session.user, id: user.id } as {
+      session.user = { ...session.user, id: user.id} as {
         id: string;
         name: string;
-        email: string;
+        image?: string | null;
       };
-      return session;
+      return session; 
     },
   },
-  secret: process.env.SECRET,
-  //secret: process.env.NEXT_AUTH_SECRET,
+  //secret: process.env.SECRET,
+  secret: process.env.NEXT_AUTH_SECRET,
 };
