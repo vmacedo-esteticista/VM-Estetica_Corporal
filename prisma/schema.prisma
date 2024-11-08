@@ -9,19 +9,19 @@ datasource db {
 
 model User {
   id                String    @id @default(uuid())
-  name              String?
-  email             String?   @unique
+  name              String
+  email             String   @unique
   emailVerified     DateTime? @map("email_verified")
   telephone         String?
-  date_brith        DateTime?
-  image             String?
-  marital_status    String?
-  cpf               String?   @unique
-  work              String?
-  emergency_contact String?
-  address           String?
-  createdAt         DateTime? @db.Date
-  updatedAt         DateTime? @db.Date
+  date_brith        DateTime
+  image             String
+  marital_status    String
+  cpf               String   @unique
+  work              String
+  emergency_contact String
+  address           String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   // Campos adicionais
   is_pregnant           Boolean?
@@ -73,7 +73,7 @@ model Booking {
   userId    String
   serviceId String
   date      DateTime
-  createdAt DateTime? @db.Date
+  createdAt DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id])
   service Service @relation(fields: [serviceId], references: [id])
